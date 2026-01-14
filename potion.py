@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import asyncio
 import os
 import platform
@@ -37,7 +38,7 @@ async def backend():
 
 
 async def load():
-    for root in "p":
+    for root in "commands", "master":
         for extension in Path(root).rglob("*.py"):
             if extension.stem.startswith("__") or any(folder in extension.parts for folder in (".venv", "models")):
                 continue
