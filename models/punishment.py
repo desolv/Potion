@@ -8,7 +8,7 @@ from models.punishment_type import PunishmentType
 class Punishment(Base):
     __tablename__ = "punishment"
 
-    punishment_id = Column(BigInteger, autoincrement=True, primary_key=True)
+    punishment_id = Column(BigInteger, primary_key=True, autoincrement=True)
 
     guild_id = Column(BigInteger, nullable=False, index=True)
     user_id = Column(BigInteger, nullable=False, index=True)
@@ -21,7 +21,7 @@ class Punishment(Base):
 
     reason = Column(String, nullable=False)
 
-    added_at = Column(DateTime, default=retrieve_current_time)
+    added_at = Column(DateTime, default=retrieve_current_time, nullable=False)
     expires_at = Column(DateTime, nullable=True)
 
-    is_active = Column(Boolean, default=True, index=True)
+    is_active = Column(Boolean, default=True, nullable=False, index=True)
