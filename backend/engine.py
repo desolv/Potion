@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import importlib
 from contextlib import asynccontextmanager
 from typing import AsyncIterator
 
@@ -42,7 +43,7 @@ class Database:
                 raise
 
     async def init_models(self) -> None:
-        # importlib.import_module("")
+        importlib.import_module("models.punishment")
 
         async with self.engine.begin() as session:
             await session.run_sync(Base.metadata.create_all)
