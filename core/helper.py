@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 
 import pytz
 
@@ -62,3 +62,36 @@ def format_given_time(
     else:
         aware = time.astimezone(pytz.utc)
     return aware.astimezone(target_tz).strftime(datetime_format)
+
+
+def parse_duration(duration_str: str) -> timedelta:
+    """
+    Parse duration string into timedelta
+    Supported formats: 10s, 5m, 2h, 1d
+    :param duration_str:
+    :return:
+    """
+    duration_str = duration_str.lower().strip()
+
+    if len(duration_str) < 2:
+        raise ValueError("Duration too short")
+
+    unit = duration_str[-1]
+    try:
+        value = int(duration_str[:-1])
+    except ValueError:
+        raise ValueError("Invalid duration format. Use format like: 10s, 5m, 2h, 1d")
+
+    if value <= 0:
+        raise ValueError("Duration must be positive")
+
+    if unit == "s":
+        return timedelta(seconds=value)
+    elif unit == "m":
+        return timedelta(minutes=value)
+    elif unit == "h":
+        return timedelta(hours=value)
+    elif unit == "d":
+        return timedelta(days=value)
+    else:
+        raise ValueError(f"Unknown unit: {unit}. Use s, m, h, or d")
