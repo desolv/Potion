@@ -1,7 +1,7 @@
 from datetime import datetime
-from typing import Optional, List
+from typing import Optional, List, Dict
 
-from sqlalchemy import select, update
+from sqlalchemy import select, update, func
 
 from backend import db
 from models.punishment import Punishment
@@ -105,3 +105,49 @@ async def get_active_timeouts(guild_id: int) -> List[Punishment]:
         )
         result = await session.execute(query)
         return list(result.scalars().all())
+
+
+async def get_guild_moderation_stats(guild_id: int) -> Dict:
+    """
+    Get moderation statistics for a guild
+    :param guild_id:
+    :return:
+    """
+    async with db.session() as session:
+        total_query = select(func.count(Punishment.punishment_id)).where(Punishment.guild_id == guild_id)
+        total_result = await session.execute(total_query)
+        total = total_result.scalar() or 0
+
+        active_query = select(func.count(Punishment.punishment_id)).where(
+            Punishment.guild_id == guild_id,
+            Punishment.is_active == True,
+        )
+        active_result = await session.execute(active_query)
+        active = active_result.scalar() or 0
+
+        inactive = total - active
+
+        type_query = (
+            select(Punishment.punishment_type, func.count(Punishment.punishment_id))
+            .where(Punishment.guild_id == guild_id)
+            .group_by(Punishment.punishment_type)
+        )
+        type_result = await session.execute(type_query)
+        by_type = {row[0]: row[1] for row in type_result.all()}
+
+        mod_query = (
+            select(Punishment.moderator_id, func.count(Punishment.punishment_id))
+            .where(Punishment.guild_id == guild_id)
+            .group_by(Punishment.moderator_id)
+            .order_by(func.count(Punishment.punishment_id).desc())
+        )
+        mod_result = await session.execute(mod_query)
+        top_moderators = {row[0]: row[1] for row in mod_result.all()}
+
+        return {
+            "total": total,
+            "active": active,
+            "inactive": inactive,
+            "by_type": by_type,
+            "top_moderators": top_moderators,
+        }
