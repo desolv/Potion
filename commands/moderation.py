@@ -215,7 +215,6 @@ class Moderation(commands.Cog):
         await service.apply_warn(
             member,
             reason,
-            ctx.author,
         )
 
         await compass.create_punishment(
@@ -284,7 +283,6 @@ class Moderation(commands.Cog):
         for punishment in punishments:
             moderator = await self.bot.fetch_user(punishment.moderator_id)
 
-            # Format punishment type
             punishment_icon = {
                 PunishmentType.BAN: "🔨",
                 PunishmentType.KICK: "👢",

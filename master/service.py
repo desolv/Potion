@@ -71,24 +71,28 @@ async def apply_timeout(
 
 
 async def apply_warn(
-    guild: discord.Guild,
     member: discord.Member,
     reason: str,
-    moderator: discord.Member,
 ) -> bool:
     """
-    Send a warning to a user
-    :param guild:
+    Send a warning to a user via DM
     :param member:
     :param reason:
-    :param moderator:
     :return:
     """
+    embed = discord.Embed(
+        title="⚠️ Warning",
+        description=f"You have been warned in **{member.guild.name}** for **{reason}**.",
+        color=0xFF9500,
+    )
+
     try:
-        # TODO
+        await member.send(embed=embed)
+        return True
+    except discord.Forbidden:
         return True
     except Exception as e:
-        print(f"Something went wrong when warning user at {guild.id}: {e}")
+        print(f"Something went wrong when warning user at {member.guild.id}: {e}")
         return False
 
 
